@@ -1,5 +1,5 @@
 /*
-   Copyright 2017 Skytechnology sp. z o.o.
+   Copyright 2013-2018 Skytechnology sp. z o.o.
 
    This file is part of LizardFS.
 
@@ -16,20 +16,26 @@
    along with LizardFS. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mount/client/lizardfs_c_api.h" // must be first
-#include "common/richacl.h"
+#include <signal.h>
+#include <iostream>
+#include <string>
+#include "utils/configuration.h"
+#include "utils/data_generator.h"
 
-extern "C" {
-
-int lzfs_int_apply_masks(liz_acl_t *lzfs_acl, uint32_t owner) {
-	if (lzfs_acl) {
-		try {
-			((RichACL *)lzfs_acl)->applyMasks(owner);
-		} catch (...) {
-			return -1;
-		}
+int main(int argc, char** argv) {
+	if (argc != 3) {
+		std::cerr << "Usage:" << std::endl
+				<< "    " << argv[0] << " <file name> <size>" << std::endl;
+		return 1;
 	}
+	signal(SIGPIPE, SIG_IGN);
 
+	try {
+		DataGenerator::validateGrowingFile(argv[1], std::stoi(argv[2]));
+	} catch (std::exception& ex) {
+		std::cerr << "File " << argv[1] << ": " << ex.what() << std::endl;
+		return 2;
+	}
 	return 0;
 }
-}
+

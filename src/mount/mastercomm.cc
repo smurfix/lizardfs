@@ -1,5 +1,6 @@
 /*
-   Copyright 2005-2010 Jakub Kruszona-Zawadzki, Gemius SA, 2013-2014 EditShare, 2013-2015 Skytechnology sp. z o.o..
+   Copyright 2005-2010 Jakub Kruszona-Zawadzki, Gemius SA, 2013-2014 EditShare,
+   2013-2019 Skytechnology sp. z o.o.
 
    This file was part of MooseFS and is part of LizardFS.
 
@@ -164,7 +165,7 @@ struct InitParams {
 static InitParams gInitParams;
 
 void master_statsptr_init(void) {
-	void *s;
+	statsnode *s;
 	s = stats_get_subnode(NULL,"master",0);
 	statsptr[MASTER_PACKETSRCVD] = stats_get_counterptr(stats_get_subnode(s,"packets_received",0));
 	statsptr[MASTER_PACKETSSENT] = stats_get_counterptr(stats_get_subnode(s,"packets_sent",0));
@@ -1392,7 +1393,7 @@ uint8_t fs_getattr(uint32_t inode, uint32_t uid, uint32_t gid, Attributes &attr)
 	uint8_t ret;
 	threc *rec = fs_get_my_threc();
 	wptr = fs_createpacket(rec,CLTOMA_FUSE_GETATTR,12);
-	if (wptr==NULL) {
+	if (!wptr) {
 		return LIZARDFS_ERROR_IO;
 	}
 	put32bit(&wptr,inode);
@@ -1496,7 +1497,7 @@ uint8_t fs_truncate(uint32_t inode, bool opened, uint32_t uid, uint32_t gid, uin
 	} catch (IncorrectDeserializationException& ex) {
 		lzfs_pretty_syslog(LOG_NOTICE,
 				"got inconsistent LIZ_MATOCL_FUSE_TRUNCATE message from master "
-				"(length:%" PRIu64"), %s", message.size(), ex.what());
+				"(length:%zu), %s", message.size(), ex.what());
 		setDisconnect(true);
 		return LIZARDFS_ERROR_IO;
 	}
@@ -1542,7 +1543,7 @@ uint8_t fs_truncateend(uint32_t inode, uint32_t uid, uint32_t gid, uint64_t leng
 	} catch (IncorrectDeserializationException& ex) {
 		lzfs_pretty_syslog(LOG_NOTICE,
 				"got inconsistent LIZ_MATOCL_FUSE_TRUNCATE_END message from master "
-				"(length:%" PRIu64"), %s", message.size(), ex.what());
+				"(length:%zu), %s", message.size(), ex.what());
 		setDisconnect(true);
 		return LIZARDFS_ERROR_IO;
 	}
@@ -2166,7 +2167,7 @@ uint8_t fs_lizwritechunk(uint32_t inode, uint32_t chunkIndex, uint32_t &lockId,
 	} catch (IncorrectDeserializationException& ex) {
 		lzfs_pretty_syslog(LOG_NOTICE,
 				"got inconsistent LIZ_MATOCL_FUSE_WRITE_CHUNK message from master "
-				"(length:%" PRIu64"), %s", message.size(), ex.what());
+				"(length:%zu), %s", message.size(), ex.what());
 		setDisconnect(true);
 		return LIZARDFS_ERROR_IO;
 	}
@@ -2191,7 +2192,7 @@ uint8_t fs_lizwriteend(uint64_t chunkId, uint32_t lockId, uint32_t inode, uint64
 	} catch (Exception& ex) {
 		lzfs_pretty_syslog(LOG_NOTICE,
 				"got inconsistent LIZ_MATOCL_FUSE_WRITE_CHUNK_END message from master "
-				"(length:%" PRIu64"), %s", message.size(), ex.what());
+				"(length:%zu), %s", message.size(), ex.what());
 		setDisconnect(true);
 		return LIZARDFS_ERROR_IO;
 	}

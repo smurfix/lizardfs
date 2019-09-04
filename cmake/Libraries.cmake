@@ -2,37 +2,50 @@ include(DownloadExternal)
 
 # Download GoogleTest
 if(ENABLE_TESTS)
-  download_external(GTEST "googletest-release-1.7.0"
-                    "https://github.com/google/googletest/archive/release-1.7.0.zip"
-                    "ef5e700c8a0f3ee123e2e0209b8b4961")
+  find_package(GTest REQUIRED)
 endif()
 
-download_external(SPDLOG "spdlog-0.14.0"
-                  "https://github.com/gabime/spdlog/archive/v0.14.0.zip"
-                  "f213d83c466aa7044a132e2488d71b11"
-                  "spdlog-1")
+# Find spdlog
+
+find_package(spdlog REQUIRED)
 
 # Find standard libraries
+
 find_package(Socket REQUIRED)
 find_package(Threads REQUIRED)
 
 if(NOT MINGW)
-  find_package(FUSE REQUIRED)
+  find_package(FUSE)
+  find_package(FUSE3)
+  if(NOT (FUSE_FOUND OR FUSE3_FOUND))
+    message(FATAL_ERROR "Could not find FUSE library (required)")
+  endif()
 endif()
 
 find_library(RT_LIBRARY rt)
 message(STATUS "RT_LIBRARY: ${RT_LIBRARY}")
+
+if(ENABLE_TCMALLOC AND ENABLE_JEMALLOC)
+    message(FATAL_ERROR "You cannot enable both TCMALLOC and JEMALLOC simultaneously")
+endif()
+
 if(ENABLE_TCMALLOC)
   find_library(TCMALLOC_LIBRARY NAMES tcmalloc_minimal)
   message(STATUS "TCMALLOC_LIBRARY: ${TCMALLOC_LIBRARY}")
 endif()
 
+if(ENABLE_JEMALLOC)
+  find_library(JEMALLOC_LIBRARY NAMES jemalloc)
+  message(STATUS "JEMALLOC_LIBRARY: ${JEMALLOC_LIBRARY}")
+endif()
 
 # Find extra binaries
+
 find_program(A2X_BINARY a2x)
 message(STATUS "a2x: ${A2X_BINARY}")
 
 # Find Zlib
+
 find_package(ZLIB)
 if(ZLIB_FOUND)
   message(STATUS "Found Zlib ${ZLIB_VERSION_STRING}")
@@ -45,6 +58,7 @@ else()
 endif()
 
 # Find Systemd
+
 INCLUDE(FindPkgConfig)
 pkg_check_modules(SYSTEMD libsystemd)
 if(SYSTEMD_FOUND)
@@ -55,10 +69,12 @@ else()
 endif()
 
 # Find Boost
+
 set(BOOST_MIN_VERSION "1.48.0")
 find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS filesystem iostreams program_options system)
 
 # Find Thrift
+
 find_package(Thrift COMPONENTS library)
 if(THRIFT_FOUND)
   message(STATUS "Found Thrift")
@@ -69,6 +85,7 @@ else()
 endif()
 
 # Find Polonaise
+
 set(POLONAISE_REQUIRED_VERSION 0.3.1)
 find_package(Polonaise ${POLONAISE_REQUIRED_VERSION} EXACT QUIET NO_MODULE NO_CMAKE_BUILDS_PATH)
 if(POLONAISE_FOUND)
@@ -84,6 +101,7 @@ else()
 endif()
 
 # Find crcutil
+
 if(NOT BIG_ENDIAN)
   INCLUDE(FindPkgConfig)
   pkg_check_modules(CRCUTIL libcrcutil)
@@ -109,12 +127,14 @@ if(NOT BIG_ENDIAN)
 endif()
 
 # Find GoogleTest
+
 if(ENABLE_TESTS)
-  set(GTEST_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/${GTEST_DIR_NAME}/include)
+  set(GTEST_INCLUDE_DIRS ${GTEST_INCLUDE_DIRS})
   set(TEST_LIBRARIES "" CACHE INTERNAL "" FORCE)
 endif()
 
 # Find Judy
+
 find_package(Judy)
 if(JUDY_FOUND)
   set(LIZARDFS_HAVE_JUDY YES)
@@ -122,15 +142,18 @@ if(JUDY_FOUND)
 endif()
 
 # Find PAM libraries
+
 find_package(PAM)
 if(PAM_FOUND)
   set(LIZARDFS_HAVE_PAM YES)
 endif()
 
 # Find BerkeleyDB
+
 find_package(DB 11.2.5.2)
 
 # Find Intel Storage Acceleration library
+
 find_library(ISAL_LIBRARY isal)
 if(APPLE)
   find_library(ISAL_PIC_LIBRARY libisal.dylib)
@@ -147,6 +170,7 @@ message(STATUS "ISAL(Intel Storage Acceleration) LIBRARY: ${ISAL_LIBRARY}")
 message(STATUS "ISAL PIC LIBRARY: ${ISAL_PIC_LIBRARY}")
 
 # Download nfs-ganesha
+
 if(ENABLE_NFS_GANESHA)
   download_external(NFS_GANESHA "nfs-ganesha-2.5-stable"
                     "https://github.com/nfs-ganesha/nfs-ganesha/archive/V2.5-stable.zip")

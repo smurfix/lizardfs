@@ -45,7 +45,7 @@ typedef uint32_t JobId;
 typedef uint32_t NamedInodeOffset;
 
 struct FsInitParams {
-	static constexpr const char *kDefaultSubfolder = "/";
+	static constexpr const char *kDefaultSubfolder = DEFAULT_MOUNTED_SUBFOLDER;
 	static constexpr bool     kDefaultDoNotRememberPassword = false;
 	static constexpr bool     kDefaultDelayedInit = false;
 #ifdef _WIN32
@@ -59,7 +59,7 @@ struct FsInitParams {
 	static constexpr unsigned kDefaultChunkserverReadTo = 2000;
 	static constexpr unsigned kDefaultChunkserverWaveReadTo = 500;
 	static constexpr unsigned kDefaultChunkserverTotalReadTo = 2000;
-	static constexpr unsigned kDefaultCacheExpirationTime = 300;
+	static constexpr unsigned kDefaultCacheExpirationTime = 0;
 	static constexpr unsigned kDefaultReadaheadMaxWindowSize = 16384;
 	static constexpr bool     kDefaultPrefetchXorStripes = false;
 
@@ -74,6 +74,9 @@ struct FsInitParams {
 	static constexpr unsigned kDefaultWriteWorkers = 10;
 	static constexpr unsigned kDefaultWriteWindowSize = 15;
 	static constexpr unsigned kDefaultSymlinkCacheTimeout = 3600;
+#if FUSE_VERSION >= 30
+	static constexpr int      kDefaultNonEmptyMounts = 0;
+#endif
 
 	static constexpr bool     kDefaultDebugMode = false;
 	static constexpr int      kDefaultKeepCache = 0;
@@ -249,7 +252,11 @@ struct EntryParam {
 	}
 
 	Inode ino;
+#if FUSE_USE_VERSION >= 30
+	uint64_t generation;
+#else
 	unsigned long generation;
+#endif
 	struct stat attr;
 	double attr_timeout;
 	double entry_timeout;

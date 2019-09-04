@@ -30,6 +30,7 @@
 #include <vector>
 
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -77,7 +78,7 @@ public:
 			if (ret < 0) {
 				continue;
 			}
-			stats_[st.st_dev] = {0, stfs.f_blocks};
+			stats_[st.st_dev] = {0, (size_t)stfs.f_blocks};
 		}
 	}
 
