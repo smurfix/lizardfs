@@ -33,7 +33,7 @@ option(ENABLE_DOCS               "Enable building the documentation"            
 option(ENABLE_EXIT_ON_USR1       "Enable handler for SIGUSR1 which calls exit()"          OFF)
 option(THROW_INSTEAD_OF_ABORT    "Throw std::exception instead of calling abort"          OFF)
 option(ENABLE_DEBUG_LOG          "Enable prefix based debug logs"                         OFF)
-option(ENABLE_URAFT              "Enable installation of uraft util"                      ON)
+option(ENABLE_URAFT              "Enable installation of uraft util"                      OFF)
 option(ENABLE_VERBOSE_ASCIIDOC   "Enable verbose output of asciidoc"                      OFF)
 option(ENABLE_TCMALLOC           "Enable use of tcmalloc-minimal library"                 OFF)
 option(ENABLE_JEMALLOC           "Enable use of jemalloc library"                         OFF)
@@ -140,6 +140,9 @@ if(MINGW)
   add_definitions(-D_WIN32_WINNT=0x0602)
   add_definitions(-DFD_SETSIZE=1024)
 endif()
+
+link_libraries(boost_system)
+link_libraries(boost_program_options)
 
 # All the environment tests (libs, includes, etc.) live here:
 include(EnvTests)
@@ -283,6 +286,11 @@ set(MAIN_SRC ${CMAKE_SOURCE_DIR}/src/main/main.cc)
 
 if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
+endif()
+
+check_library_exists(atomic __atomic_fetch_add_4 "" LIBATOMIC_NEEDED)
+if(LIBATOMIC_NEEDED)
+  link_libraries(atomic)
 endif()
 
 if(ZLIB_FOUND)

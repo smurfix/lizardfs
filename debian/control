@@ -10,6 +10,9 @@ Build-Depends: asciidoc (>= 8.6.6),
                zlib1g-dev,
                python,
                libspdlog-dev,
+               libboost-dev,
+               libboost-system-dev,
+               libboost-program-options-dev,
 Standards-Version: 3.9.3
 Homepage: http://lizardfs.org/
 
