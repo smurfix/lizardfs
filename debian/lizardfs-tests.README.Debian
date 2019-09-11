@@ -1,0 +1,51 @@
+Preparations
+============
+
+    # /usr/share/lizardfs/setup_machine.sh setup /mnt/hdA /mnt/hdB /mnt/hdC /mnt/hdD
+
+    # getent group fuse || addgroup --system fuse
+
+
+Useful commands
+===============
+
+    lizardfs-tests --help
+    lizardfs-tests --gtest_list_tests
+
+
+Running tests
+=============
+
+A particular test:
+------------------
+
+    # cd /usr/share/lizardfs
+    # ./run-test.sh test_suites/SanityChecks/test_write_and_read.sh
+
+or
+
+    # lizardfs-tests  --gtest_filter='SanityChecks.test_sparse_file'
+
+
+Batch of tests:
+---------------
+
+    # lizardfs-tests --gtest_filter='SanityChecks.*'
+    # lizardfs-tests --gtest_filter='ShortSystemTests.*'
+
+
+Failing tests:
+--------------
+
+    SanityChecks.test_wireshark_plugin_generation  (needs to download wireshark sources)
+
+    ShortSystemTests.test_polonaise                (needs optional "polonaise")
+    ShortSystemTests.test_metadata_polonaise       (needs optional "polonaise")
+    ShortSystemTests.test_moosefs_upgrade          (needs to build moosefs)
+    ShortSystemTests.test_acl_permissions          (needs patched libfuse)
+
+
+Unimportant tests:
+------------------
+
+    SanityChecks.test_code_style

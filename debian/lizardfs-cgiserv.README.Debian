@@ -1,0 +1,9 @@
+Access at
+
+    http://localhost:9425
+ or
+    http://mfsmaster:9425/mfs.cgi?masterhost=mfsmaster
+
+Override default settings in
+
+    /etc/default/lizardfs-cgiserv
