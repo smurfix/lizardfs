@@ -27,6 +27,10 @@ if [ -z ${LIZARDFS_SET_RC_BUILD_NUMBER:-} ]; then
 fi
 
 cmake .. \
+    -DCMAKE_VERBOSE_MAKEFILE=ON  \
+    -DENABLE_VERBOSE_ASCIIDOC=ON \
+    -DENABLE_TCMALLOC=NO         \
+    -DENABLE_UTILS=YES           \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DENABLE_TESTS=NO \
 	-DCMAKE_INSTALL_PREFIX=/ \
@@ -38,6 +42,7 @@ cmake .. \
 	-DENABLE_NFS_GANESHA=YES \
 	-DENABLE_URAFT=YES \
 	-DENABLE_POLONAISE=OFF
+
 
 cat >../Makefile <<END
 all:
