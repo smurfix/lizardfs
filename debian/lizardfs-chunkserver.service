@@ -1,0 +1,19 @@
+[Unit]
+Description=LizardFS chunkserver daemon
+Documentation=man:mfschunkserver
+After=local-fs.target network.target lizardfs-master.service
+Wants=local-fs.target network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/mfschunkserver -d start
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-abort
+OOMScoreAdjust=-999
+IOAccounting=true
+IOWeight=250
+StartupIOWeight=100
+KeyringMode=inherit
+
+[Install]
+WantedBy=multi-user.target
