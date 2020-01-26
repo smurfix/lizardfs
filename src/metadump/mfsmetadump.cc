@@ -80,7 +80,7 @@ void print_name(FILE *in,uint32_t nleng) {
 		y = (nleng>1024)?1024:nleng;
 		x = fread(buff,1,y,in);
 		for (i=0 ; i<x ; i++) {
-			if (buff[i]<32 || buff[i]>127) {
+			if (buff[i]<32) {
 				buff[i]='.';
 			}
 		}
