@@ -1,0 +1,27 @@
+-------- -------- --------
+
+ Beware of "mlocate" scanning of chunkserver volumes. To avoid problems add
+ "/var/lib/lizardfs" and all volumes as per "/etc/lizardfs/mfshdd.cfg" to
+ PRUNEPATHS in the "/etc/updatedb.conf" like in the following example:
+
+    PRUNEPATHS="/tmp /var/spool /media /mnt /var/lib/lizardfs"
+
+-------- -------- --------
+
+ Make sure that HDD mount points are not writable to "lizardfs" user to
+ avoid using empty mount point as storage when (failed) HDD is not mounted.
+ Alternatively storage volume can be configured to use subfolder in
+ "/etc/lizardfs/mfshdd.cfg".
+
+-------- -------- --------
+
+ Chunkserver may be very slow when one of its volumes becomes near-full
+ with over 99% utilisation. To relieve situation consider using the
+ following setting in the "/etc/lizardfs/mfschunkserver.cfg":
+
+    HDD_LEAVE_SPACE_DEFAULT = 5G
+
+ This will prevent writes to near full volumes by marking them as 100%
+ utilised when they have less than 5 GiB of free space left.
+
+-------- -------- --------

@@ -3,16 +3,24 @@ Section: admin
 Priority: extra
 Maintainer: Adam Ochmanski <contact@lizardfs.org>
 Build-Depends: asciidoc (>= 8.6.6),
-               debhelper (>= 9),
                cmake (>= 2.8),
-               libfuse-dev,
-               pkg-config,
-               zlib1g-dev,
-               python,
-               libspdlog-dev,
+               debhelper (>= 9),
                libboost-dev,
-               libboost-system-dev,
                libboost-program-options-dev,
+               libboost-system-dev,
+               libcrcutil-dev,
+               libdb-dev,
+               libfuse-dev,
+               libjudy-dev,
+               libpam-dev,
+               libspdlog-dev,
+               libsystemd-dev,
+               libthrift-dev,
+               pkg-config,
+               python,
+               unzip,
+               xsltproc,
+               zlib1g-dev,
 Standards-Version: 3.9.3
 Homepage: http://lizardfs.org/
 

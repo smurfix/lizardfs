@@ -1,0 +1,11 @@
+
+mfsmount /mnt/lizardfs -H mfsmaster
+
+## /etc/fstab
+
+    mfsmount  /mnt/lizardfs  fuse  mfsmaster={MFSMASTER_IP},mfsport={MFSMASTER_PORT},_netdev  0 0
+
+
+## Autofs
+
+    lizardfs  -fstype=fuse,allow_other  :mfsmount

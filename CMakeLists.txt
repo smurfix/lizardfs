@@ -275,6 +275,9 @@ else()
   message(STATUS "CRC checksums disabled")
 endif()
 
+link_libraries(boost_system)
+link_libraries(boost_program_options)
+
 set(CHARTS_CSV_CHARTID_BASE 90000)
 
 # Create config.h file

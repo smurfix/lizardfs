@@ -12,15 +12,19 @@ override_dh_auto_configure:
 override_dh_strip:
 	dh_strip --dbg-package=lizardfs-dbg
 
+override_dh_auto_install:
+	dh_auto_install
+	## rename config files
+	for i in debian/tmp/etc/lizardfs/*.cfg.dist; do \
+	    mv -n -v "$$i" "$${i%%.dist}"          \
+	;done
+
 override_dh_installinit:
 	dh_installinit --no-start
 	dh_installinit --no-start -plizardfs-uraft --name=lizardfs-ha-master
 
-override_dh_systemd_enable:
-	dh_systemd_enable --no-enable
-
-override_dh_systemd_start:
-	dh_systemd_start --no-start
+override_dh_installsystemd:
+	dh_installsystemd --no-stop-on-upgrade --no-enable --no-start
 
 %:
 	dh $@ --with systemd

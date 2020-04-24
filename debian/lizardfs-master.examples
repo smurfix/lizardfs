@@ -1,0 +1,5 @@
+debian/tmp/etc/lizardfs/globaliolimits.cfg*
+debian/tmp/etc/lizardfs/mfsexports.cfg*
+debian/tmp/etc/lizardfs/mfstopology.cfg*
+debian/tmp/etc/lizardfs/mfsgoals.cfg*
+debian/tmp/etc/lizardfs/mfsmaster.cfg*

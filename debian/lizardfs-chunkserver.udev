@@ -1,0 +1,2 @@
+# Hide LizardFS block devices from udisks, and thus from user desktops:
+SUBSYSTEM=="block", ENV{DM_NAME}=="lizard*", ENV{UDISKS_PRESENTATION_HIDE}="1", ENV{UDISKS_IGNORE}="1"

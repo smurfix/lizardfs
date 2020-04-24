@@ -1,0 +1,14 @@
+[Unit]
+Description=LizardFS metalogger server daemon
+Documentation=man:mfsmetalogger
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/mfsmetalogger -d start
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

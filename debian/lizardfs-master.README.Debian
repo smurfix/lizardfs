@@ -1,0 +1,62 @@
+High availability
+-----------------
+
+This section describes sample (not very well tested but working) HA
+configuration for master failover.
+
+A backup master ("shadow" master) can be configured for hot standby for
+automatic failover using UCARP.
+
+    sudo apt-get install ucarp
+
+Here is sample configuration of "/etc/network/interfaces"
+on "master" (SysV):
+~~~~
+    auto bond0
+    iface bond0 inet static
+            address 192.168.0.25
+            netmask 255.255.255.0
+            bond-slaves eth0 eth1 eth2
+            bond-mode balance-rr
+            bond-packets-per-slave 4
+            bond-miimon 100
+            bond-downdelay 200
+            bond-updelay 200
+        ucarp-vid 250
+        ucarp-vip 192.168.0.251
+        ucarp-password vryhrdtgss77
+        ucarp-advskew 0
+        ucarp-advbase 1
+        ucarp-master yes
+    iface bond0:ucarp inet static
+        address 192.168.0.251
+        netmask 255.255.255.0
+        post-up  ln -sf mfsmaster.master.cfg /etc/lizardfs/mfsmaster.cfg; /etc/init.d/lizardfs-master reload || /etc/init.d/lizardfs-master start
+        pre-down ln -sf mfsmaster.shadow.cfg /etc/lizardfs/mfsmaster.cfg; /etc/init.d/lizardfs-master stop
+        post-down /etc/init.d/lizardfs-master start
+~~~~
+
+Sample configuration of "/etc/network/interfaces"
+on "shadow" (systemd):
+~~~~
+    auto br0
+    iface br0 inet static
+            address 192.168.0.20
+            netmask 255.255.255.0
+            bridge_fd 0
+            bridge_maxwait 0
+            bridge_stp off
+            bridge_ageing 0
+        ucarp-vid 250
+        ucarp-vip 192.168.0.251
+        ucarp-password vryhrdtgss77
+        ucarp-advskew 0
+        ucarp-advbase 1
+        ucarp-master no
+    iface br0:ucarp inet static
+        address 192.168.0.251
+        netmask 255.255.255.0
+        post-up  ln -sf mfsmaster.master.cfg /etc/lizardfs/mfsmaster.cfg; /bin/systemctl reload lizardfs-master || /bin/systemctl start lizardfs-master
+        pre-down ln -sf mfsmaster.shadow.cfg /etc/lizardfs/mfsmaster.cfg; /bin/systemctl stop lizardfs-master
+        post-down /bin/systemctl start lizardfs-master
+~~~~
