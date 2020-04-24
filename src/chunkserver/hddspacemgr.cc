@@ -527,7 +527,7 @@ static int hdd_chunk_getattr(Chunk *c) {
 bool hdd_chunk_trylock(Chunk *c) {
 	assert(hashlock.try_lock() == false);
 	bool ret = false;
-	TRACETHIS1(chunkid);
+	TRACETHIS1(c->chunkid);
 	if (c != nullptr && c->state == CH_AVAIL) {
 		c->state = CH_LOCKED;
 		ret = true;
@@ -914,11 +914,11 @@ void hdd_check_folders() {
 				break;
 			case SCST_SCANFINISHED:
 				f->scanthread.join();
-				// no break - it's ok !!!
+				/* fallthrough */
 			case SCST_SENDNEEDED:
 			case SCST_SCANNEEDED:
 				f->scanstate = SCST_WORKING;
-				// no break - it's ok !!!
+				/* fallthrough */
 			case SCST_WORKING:
 				hdd_senddata(f,1);
 				changed = 1;
@@ -3707,7 +3707,7 @@ static void hdd_folders_reinit(void) {
 	if (!fd) {
 		throw InitializeException("can't open hdd config file " + hddfname +": " +
 				strerr(errno) + " - new file can be created using " +
-				ETC_PATH "/mfshdd.cfg.dist");
+				CHUNKSERVER_EXAMPLES_SUBDIR "/mfshdd.cfg");
 	}
 	lzfs_pretty_syslog(LOG_INFO, "hdd configuration file %s opened", hddfname.c_str());
 

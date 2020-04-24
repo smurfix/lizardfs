@@ -27,4 +27,4 @@ override_dh_installsystemd:
 	dh_installsystemd --no-stop-on-upgrade --no-enable --no-start
 
 %:
-	dh $@ --with systemd
+	dh $@
