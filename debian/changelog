@@ -1,3 +1,9 @@
+lizardfs (3.13.0.2) stable; urgency=medium
+
+  * Merge
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Fri, 24 Apr 2020 11:43:05 +0200
+
 lizardfs (3.13.0.1) stable; urgency=medium
 
   * Update to current main branch

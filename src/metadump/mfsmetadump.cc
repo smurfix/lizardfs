@@ -76,7 +76,7 @@ void print_name(FILE *in,uint32_t nleng) {
 	uint8_t buff[1024];
 	uint32_t x,y,i;
 	size_t happy;
-	fprintf(buf,"%" PRIu32 ":",nleng);
+	fprintf(stdout,"%" PRIu32 ":",nleng);
 	while (nleng>0) {
 		y = (nleng>1024)?1024:nleng;
 		x = fread(buff,1,y,in);
