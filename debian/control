@@ -1,7 +1,7 @@
 Source: lizardfs
 Section: admin
 Priority: extra
-Maintainer: Adam Ochmanski <contact@lizardfs.org>
+Maintainer: LizardFS <contact@lizardfs.org>
 Build-Depends: asciidoc (>= 8.6.6),
                cmake (>= 2.8),
                debhelper (>= 9),
@@ -10,17 +10,21 @@ Build-Depends: asciidoc (>= 8.6.6),
                libboost-system-dev,
                libcrcutil-dev,
                libdb-dev,
-               libfuse-dev,
+               libfuse3-dev,
                libjudy-dev,
                libpam-dev,
                libspdlog-dev,
                libsystemd-dev,
                libthrift-dev,
                pkg-config,
-               python,
-               unzip,
-               xsltproc,
                zlib1g-dev,
+               libspdlog-dev,
+               libfmt-dev,
+               libboost-system-dev,
+               libboost-program-options-dev,
+               python3,
+               python3-black,
+               python3-mypy,
 Standards-Version: 3.9.3
 Homepage: http://lizardfs.org/
 
@@ -78,6 +82,22 @@ Provides: mfs-client
 Description: LizardFS client
  LizardFS clients: mfsmount and mfstools.
 
+<<<<<<< HEAD
+||||||| 15489e3c
+Package: lizardfs-client3
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lizardfs-client
+Description: LizardFS client using FUSE3
+ LizardFS client: mfsmount3.
+
+=======
+Package: lizardfs-client3
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lizardfs-client, fuse3
+Description: LizardFS client using FUSE3
+ LizardFS client: mfsmount3.
+
+>>>>>>> a2fa58cb6317bcd48e585ebf3277c3ccfd362828
 Package: lizardfs-lib-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -99,7 +119,7 @@ Description: LizardFS administration tools
 Package: lizardfs-cgi
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
-         python
+         python3
 Conflicts: mfs-cgi
 Replaces: mfs-cgi
 Provides: mfs-cgi
@@ -109,7 +129,7 @@ Description: LizardFS CGI Monitor
 Package: lizardfs-cgiserv
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, lizardfs-cgi,
-         python
+         python3
 Conflicts: mfs-cgiserv
 Replaces: mfs-cgiserv
 Provides: mfs-cgiserv

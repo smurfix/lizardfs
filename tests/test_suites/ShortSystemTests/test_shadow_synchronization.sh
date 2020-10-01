@@ -2,14 +2,14 @@ timeout_set 1 minute
 
 master_cfg="MAGIC_DISABLE_METADATA_DUMPS = 1"
 master_cfg+="|OPERATIONS_DELAY_INIT = 1"
-master_cfg+="|CHUNKS_LOOP_TIME = 1|CHUNKS_LOOP_MAX_CPU = 90"
+master_cfg+="|CHUNKS_LOOP_MIN_TIME = 1|CHUNKS_LOOP_MAX_CPU = 90"
 master_cfg+="|BACK_META_KEEP_PREVIOUS = 0"
 
 CHUNKSERVERS=3 \
 	MASTERSERVERS=2 \
 	MOUNTS=2 \
 	USE_RAMDISK="YES" \
-	MOUNT_0_EXTRA_CONFIG="mfsacl,mfscachemode=NEVER,mfsreportreservedperiod=1,mfsdirentrycacheto=0" \
+	MOUNT_0_EXTRA_CONFIG="mfscachemode=NEVER,mfsreportreservedperiod=1,mfsdirentrycacheto=0" \
 	MOUNT_1_EXTRA_CONFIG="mfsmeta" \
 	MFSEXPORTS_EXTRA_OPTIONS="allcanchangequota,ignoregid" \
 	MFSEXPORTS_META_EXTRA_OPTIONS="nonrootmeta" \

@@ -14,6 +14,9 @@ Specifically:
 * creates a 2G ramdisk in /mnt/ramdisk
 * creates 6 files mounted using loop device
 
+Example:
+$0 setup /mnt /mnt /mnt /mnt /mnt /mnt
+
 You need root permissions to run this script
 EOF
 	exit 1
@@ -26,6 +29,9 @@ shift
 
 # Make this script safe and bug-free ;)
 set -eux
+
+echo ; echo Add group fuse
+groupadd -f fuse
 
 echo ; echo Add user lizardfstest
 if ! getent passwd lizardfstest > /dev/null; then
@@ -58,6 +64,7 @@ if ! [[ -f /etc/sudoers.d/lizardfstest ]] || \
 	cat >/etc/sudoers.d/lizardfstest <<-END
 		ALL ALL = (lizardfstest) NOPASSWD: ALL
 		ALL ALL = NOPASSWD: /usr/bin/pkill -9 -u lizardfstest
+		ALL ALL = NOPASSWD: /bin/rm -rf /tmp/lizardfs_error_dir /tmp/test_err
 		lizardfstest ALL = NOPASSWD: /bin/sh -c echo\ 1\ >\ /proc/sys/vm/drop_caches
 	END
 	chmod 0440 /etc/sudoers.d/lizardfstest
@@ -167,7 +174,9 @@ fi
 echo ; echo Install necessary programs
 # lsb_release is required by both build scripts and this script -- install it first
 if ! command -v lsb_release; then
-	if command -v yum; then
+	if command -v dnf; then
+		dnf install redhat-lsb-core
+	elif command -v yum; then
 		yum install redhat-lsb-core
 	elif command -v apt-get; then
 		apt-get install lsb-release
@@ -177,23 +186,23 @@ fi
 release="$(lsb_release -si)/$(lsb_release -sr)"
 case "$release" in
 	LinuxMint/*|Ubuntu/*|Debian/*)
-		apt-get install asciidoc build-essential cmake debhelper devscripts git libfuse-dev
+		apt-get install asciidoc build-essential cmake debhelper devscripts git fuse3 libfuse3-dev
 		apt-get install pkg-config zlib1g-dev libboost-program-options-dev libboost-system-dev
 		apt-get install acl attr dbench netcat-openbsd pylint python3 rsync socat tidy wget
 		apt-get install libgoogle-perftools-dev libboost-filesystem-dev libboost-iostreams-dev
-		apt-get install libpam0g-dev libdb-dev nfs4-acl-tools
-		;;
-	CentOS/6)
-		yum install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
-		yum install acl attr nc rsync tidy wget boost-program-options boost-system
-		yum install libboost-filesystem libboost-iostreams
-		yum install pam-devel libdb-devel nfs4-acl-tools
+		apt-get install libpam0g-dev libdb-dev nfs4-acl-tools libfmt-dev
 		;;
 	CentOS/7*)
 		yum install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
 		yum install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
 		yum install boost-program-options boost-system libboost-filesystem libboost-iostreams
 		yum install pam-devel libdb-devel nfs4-acl-tools
+		;;
+	CentOS/8*)
+		dnf install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
+		dnf install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
+		dnf install boost-program-options boost-system boost-filesystem boost-iostreams
+		dnf install pam-devel libdb-devel nfs4-acl-tools gtest-devel fuse3 fuse3-devel
 		;;
 	*)
 		set +x

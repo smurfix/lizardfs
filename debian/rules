@@ -4,7 +4,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-.PHONY: override_dh_strip override_dh_auto_configure override_dh_systemd_enable override_dh_systemd_start override_dh_installinit
+.PHONY: override_dh_strip override_dh_auto_configure override_dh_installsystemd override_dh_installinit
 
 override_dh_auto_configure:
 	./configure --with-doc

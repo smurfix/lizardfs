@@ -1,5 +1,12 @@
 # Load config file with machine-specific configuration
-if [[ -f /etc/lizardfs_tests.conf ]]; then
+if [[ ! -z "${LIZARDFS_TESTS_CONF:-}" && -f "${LIZARDFS_TESTS_CONF}" ]]; then
+	echo "Using \"${LIZARDFS_TESTS_CONF}\" tests configuration file"
+	. "${LIZARDFS_TESTS_CONF}"
+elif [[ -f /home/${SUDO_USER}/etc/lizardfs/tests.conf ]]; then
+	echo "Using \"/home/${SUDO_USER}/etc/lizardfs/tests.conf\" tests configuration file"
+	. /home/${SUDO_USER}/etc/lizardfs/tests.conf
+elif [[ -f /etc/lizardfs_tests.conf ]]; then
+	echo "Using the default \"/etc/lizardfs_tests.conf\" tests configuration file"
 	. /etc/lizardfs_tests.conf
 fi
 
@@ -40,7 +47,7 @@ fi
 check_configuration() {
 	for prog in \
 			$LIZARDFS_ROOT/sbin/{mfsmaster,mfschunkserver} \
-			$LIZARDFS_ROOT/bin/{mfsmount,lizardfs} \
+			$LIZARDFS_ROOT/bin/lizardfs \
 			$LIZARDFS_ROOT/bin/file-generate \
 			$LIZARDFS_ROOT/bin/file-validate
 	do
@@ -48,6 +55,10 @@ check_configuration() {
 			test_fail "Configuration error, executable $prog not found"
 		fi
 	done
+
+	if [[ ! -x $LIZARDFS_ROOT/bin/mfsmount ]] && [[ ! -x $LIZARDFS_ROOT/bin/mfsmount3 ]]; then
+		test_fail "Configuration error, mfsmount executable ($LIZARDFS_ROOT/bin/mfsmount or $LIZARDFS_ROOT/bin/mfsmount3) not found"
+	fi
 
 	if ! df -T "$RAMDISK_DIR" | grep "tmpfs\|ramfs" >/dev/null; then
 		test_fail "Configuration error, ramdisk ($RAMDISK_DIR) is missing"
