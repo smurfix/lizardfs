@@ -1,3 +1,9 @@
+lizardfs (3.13.0.3) stable; urgency=medium
+
+  * Fix debian/control nonsense
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Mon, 05 Oct 2020 21:11:07 +0200
+
 lizardfs (3.13.0.2) stable; urgency=medium
 
   * Merge
