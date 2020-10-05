@@ -20,7 +20,7 @@ option(ENABLE_WERROR            "Enable treating compilation warnings as errors"
 option(ENABLE_LIGHTMFS          "Enable light version of LizardFS"                       OFF)
 option(ENABLE_UTILS             "Enable building additional binaries used e.g. in tests" OFF)
 option(ENABLE_TESTS             "Enable building unit and functional tests"              OFF)
-option(ENABLE_DOCS              "Enable building the documentation"                      ON)
+option(ENABLE_DOCS              "Enable building the documentation"                      OFF)
 option(ENABLE_EXIT_ON_USR1      "Enable handler for SIGUSR1 which calls exit()"          OFF)
 option(THROW_INSTEAD_OF_ABORT   "Throw std::exception instead of calling abort"          OFF)
 option(ENABLE_DEBUG_LOG         "Enable prefix based debug logs"                         OFF)

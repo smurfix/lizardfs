@@ -1,3 +1,9 @@
+lizardfs (3.13.0.6) stable; urgency=medium
+
+  * drop doc build
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Mon, 05 Oct 2020 21:56:35 +0200
+
 lizardfs (3.13.0.5) stable; urgency=medium
 
   * add unzip, wants to download ganesha
