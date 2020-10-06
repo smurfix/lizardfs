@@ -11,6 +11,9 @@ usr/bin/mfsgetgoal
 usr/bin/mfsgettrashtime
 usr/bin/mfsmakesnapshot
 usr/bin/mfsmount
+usr/bin/mfsmount3
+usr/bin/mfsping
+usr/bin/mfspingserv
 usr/bin/mfsrepquota
 usr/bin/mfsrgetgoal
 usr/bin/mfsrgettrashtime
