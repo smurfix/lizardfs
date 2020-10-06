@@ -1,3 +1,9 @@
+lizardfs (3.13.0.9) stable; urgency=medium
+
+  * Include stdio if you use fprintf and stderr!
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 06 Oct 2020 14:45:57 +0200
+
 lizardfs (3.13.0.8) stable; urgency=medium
 
   * Depend on docbook instead of trying to load the stuff from sourceforge

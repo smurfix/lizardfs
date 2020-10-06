@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdio.h>
 
 static int gWaiter[2] = {-1, -1};
 
