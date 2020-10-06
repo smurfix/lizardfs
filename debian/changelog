@@ -1,3 +1,9 @@
+lizardfs (3.13.0.11) stable; urgency=medium
+
+  * install files
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 06 Oct 2020 15:27:06 +0200
+
 lizardfs (3.13.0.10) stable; urgency=medium
 
   * No we do not want a stone-age Ganesha
