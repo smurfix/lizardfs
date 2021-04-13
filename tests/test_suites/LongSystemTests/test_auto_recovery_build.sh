@@ -1,4 +1,4 @@
-timeout_set 30 minutes
+timeout_set 1 hour
 assert_program_installed git
 assert_program_installed cmake
 
@@ -7,7 +7,6 @@ CHUNKSERVERS=2 \
 	CHUNKSERVER_EXTRA_CONFIG="MASTER_RECONNECTION_DELAY = 1" \
 	MASTER_EXTRA_CONFIG="AUTO_RECOVERY = 1"\
 	MOUNT_EXTRA_CONFIG="mfscachemode=NEVER" \
-	USE_RAMDISK="YES" \
 	setup_local_empty_lizardfs info
 
 MINIMUM_PARALLEL_JOBS=5

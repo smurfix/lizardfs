@@ -1,5 +1,3 @@
-set -eu
-
 # Enable alias expansion and clear inherited aliases.
 unalias -a
 shopt -s expand_aliases extdebug
@@ -30,3 +28,4 @@ done
 . tools/metadata.sh
 . tools/color.sh
 . tools/continuous_test.sh
+. tools/logs.sh

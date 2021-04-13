@@ -11,6 +11,8 @@ add_custom_target(list_of_test_cases
     > test_suites.h.tmp
   COMMAND ${CMAKE_COMMAND} -E copy_if_different test_suites.h.tmp test_suites.h
 
+  COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && bash tools/generate_tests_from_templates.sh
+
   COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/test_suites/ -name test_*.sh
     ${filter_out}
     | sed -e "s/[.]sh$//"
@@ -34,5 +36,5 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}) # test_cases.h is located here
 add_definitions(-DTEST_DATA_PATH=${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(lizardfs-tests lizardfs-tests.cc)
 add_dependencies(lizardfs-tests list_of_test_cases)
-target_link_libraries(lizardfs-tests ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(lizardfs-tests ${GTEST_BOTH_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 install(TARGETS lizardfs-tests RUNTIME DESTINATION ${BIN_SUBDIR})

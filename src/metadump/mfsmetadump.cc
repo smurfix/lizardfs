@@ -74,7 +74,7 @@ int chunk_load(FILE *fd, bool loadLockIds) {
 
 void print_name(FILE *in,uint32_t nleng) {
 	uint8_t buff[1024];
-	uint32_t x,y,i;
+	uint32_t x,y;
 	size_t happy;
 	fprintf(stdout,"%" PRIu32 ":",nleng);
 	while (nleng>0) {

@@ -15,20 +15,89 @@ Specifically:
 * creates 6 files mounted using loop device
 
 Example:
-$0 setup /mnt /mnt /mnt /mnt /mnt /mnt
+$0 setup /mnt
+$0 setup /mnt/hda /mnt/hdb
 
 You need root permissions to run this script
 EOF
 	exit 1
 }
 
-if [[ $1 != setup ]]; then
+minimum_number_of_args=2
+if [[ ( ( "${1}" != "setup" ) && ( "${1}" != "setup-force" ) ) || ( ${#} -lt ${minimum_number_of_args} ) ]]; then
 	usage >&2
 fi
+
+grep -q lizardfstest_loop /etc/fstab
+if [[ ( "${1}" != "setup-force" ) && ( ${?} == 0 ) ]]; then
+	echo The machine is at least partialy configured
+	echo Run revert-setup-machine.sh to revert the current configuration
+	exit 1
+fi
+
 shift
+umask 0022
 
 # Make this script safe and bug-free ;)
 set -eux
+
+echo ; echo Install necessary programs
+# lsb_release is required by both build scripts and this script -- install it first
+if ! command -v lsb_release; then
+	if command -v dnf; then
+		dnf -y install redhat-lsb-core
+	elif command -v yum; then
+		yum -y install redhat-lsb-core
+	elif command -v apt-get; then
+		apt-get -y install lsb-release
+	fi
+fi
+# determine which OS we are running and choose the right set of packages to be installed
+release="$(lsb_release -si)/$(lsb_release -sr)"
+case "$release" in
+	LinuxMint/*|Ubuntu/*|Debian/*)
+		apt-get -y install asciidoc build-essential cmake debhelper devscripts git fuse3 libfuse3-dev
+		apt-get -y install libfuse-dev pkg-config zlib1g-dev libboost-program-options-dev
+		apt-get -y install libboost-system-dev acl attr dbench netcat-openbsd pylint python3 rsync
+		apt-get -y install socat tidy wget libgoogle-perftools-dev libboost-filesystem-dev
+		apt-get -y install libboost-iostreams-dev libpam0g-dev libdb-dev nfs4-acl-tools libfmt-dev
+		apt-get -y install python3-pip valgrind ccache libfmt-dev libisal-dev libcrcutil-dev curl
+		apt-get -y install libgtest-dev libspdlog-dev libjudy-dev
+		pip3 install mypy black
+		;;
+	CentOS/7*)
+		yum -y install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
+		yum -y install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
+		yum -y install boost-program-options boost-system libboost-filesystem libboost-iostreams
+		yum -y install pam-devel libdb-devel nfs4-acl-tools
+		;;
+	CentOS/8*)
+		dnf -y install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
+		dnf -y install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
+		dnf -y install boost-program-options boost-system boost-filesystem boost-iostreams
+		dnf -y install pam-devel libdb-devel nfs4-acl-tools fuse3 fuse3-devel
+		dnf -y install fmt-devel spdlog-devel boost-devel libtirpc-devel
+		dnf -y install --enablerepo=PowerTools gtest-devel
+		# install openbsd version of netcat
+		dnf -y install epel-release
+		dnf -y update
+		dnf -y install --enablerepo=epel-testing netcat
+		update-alternatives --install /usr/bin/nc nc /usr/bin/netcat 1
+		pip3 install black mypy
+		;;
+	Fedora/32*)
+		dnf -y install cmake gcc-c++ gtest-devel fmt-devel spdlog-devel fuse-devel fuse3-devel boost-devel
+		dnf -y install Judy-devel pam-devel libdb-devel thrift-devel valgrind pylint nfs4-acl-tools
+		# install openbsd version of netcat
+		dnf -y install netcat
+		update-alternatives --install /usr/bin/nc nc /usr/bin/netcat 1
+		pip3 install black mypy
+		;;
+	*)
+		set +x
+		echo "Installation of required packages SKIPPED, '$release' isn't supported by this script"
+		;;
+esac
 
 echo ; echo Add group fuse
 groupadd -f fuse
@@ -64,7 +133,7 @@ if ! [[ -f /etc/sudoers.d/lizardfstest ]] || \
 	cat >/etc/sudoers.d/lizardfstest <<-END
 		ALL ALL = (lizardfstest) NOPASSWD: ALL
 		ALL ALL = NOPASSWD: /usr/bin/pkill -9 -u lizardfstest
-		ALL ALL = NOPASSWD: /bin/rm -rf /tmp/lizardfs_error_dir /tmp/test_err
+		ALL ALL = NOPASSWD: /bin/rm -rf /tmp/lizardfs_error_dir
 		lizardfstest ALL = NOPASSWD: /bin/sh -c echo\ 1\ >\ /proc/sys/vm/drop_caches
 	END
 	chmod 0440 /etc/sudoers.d/lizardfstest
@@ -141,14 +210,19 @@ if ! grep /mnt/ramdisk /etc/fstab >/dev/null; then
 fi
 
 echo ; echo Prepare loop devices
-if ! grep lizardfstest_loop /etc/fstab >/dev/null; then
-	i=0
-	devices=6
-	loops=()
-	echo "# Loop devices used in LizardFS tests" >> /etc/fstab
-	for disk in "$@" "$@" "$@" "$@" "$@" "$@"; do
-		if (( i == devices )); then
+#creating loop devices more or less evenly distributed between available disks
+i=0
+devices=6
+loops=()
+while [ $i -lt $devices ] ; do
+	for disk in "$@"; do
+		if (( i == devices )); then #stop if we have enough devices
 			break
+		fi
+		loops+=(/mnt/lizardfstest_loop_$i)
+		if grep -q lizardfstest_loop_$i /etc/fstab; then
+			(( ++i ))
+			continue
 		fi
 		mkdir -p "$disk/lizardfstest_images"
 		# Create image file
@@ -161,54 +235,10 @@ if ! grep lizardfstest_loop /etc/fstab >/dev/null; then
 		# Mount and set permissions
 		mount /mnt/lizardfstest_loop_$i
 		chmod 1777 /mnt/lizardfstest_loop_$i
-		loops+=(/mnt/lizardfstest_loop_$i)
 		(( ++i ))
 	done
-	if (( i > 0 )) ; then
-		echo ': ${LIZARDFS_LOOP_DISKS:="'"${loops[*]}"'"}'
-	else
-		echo ': ${LIZARDFS_LOOP_DISKS:=}'
-	fi >> /etc/lizardfs_tests.conf
-fi
-
-echo ; echo Install necessary programs
-# lsb_release is required by both build scripts and this script -- install it first
-if ! command -v lsb_release; then
-	if command -v dnf; then
-		dnf install redhat-lsb-core
-	elif command -v yum; then
-		yum install redhat-lsb-core
-	elif command -v apt-get; then
-		apt-get install lsb-release
-	fi
-fi
-# determine which OS we are running and choose the right set of packages to be installed
-release="$(lsb_release -si)/$(lsb_release -sr)"
-case "$release" in
-	LinuxMint/*|Ubuntu/*|Debian/*)
-		apt-get install asciidoc build-essential cmake debhelper devscripts git fuse3 libfuse3-dev
-		apt-get install pkg-config zlib1g-dev libboost-program-options-dev libboost-system-dev
-		apt-get install acl attr dbench netcat-openbsd pylint python3 rsync socat tidy wget
-		apt-get install libgoogle-perftools-dev libboost-filesystem-dev libboost-iostreams-dev
-		apt-get install libpam0g-dev libdb-dev nfs4-acl-tools libfmt-dev
-		;;
-	CentOS/7*)
-		yum install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
-		yum install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
-		yum install boost-program-options boost-system libboost-filesystem libboost-iostreams
-		yum install pam-devel libdb-devel nfs4-acl-tools
-		;;
-	CentOS/8*)
-		dnf install asciidoc cmake fuse-devel git gcc gcc-c++ make pkgconfig rpm-build zlib-devel
-		dnf install acl attr dbench nc pylint rsync socat tidy wget gperftools-libs
-		dnf install boost-program-options boost-system boost-filesystem boost-iostreams
-		dnf install pam-devel libdb-devel nfs4-acl-tools gtest-devel fuse3 fuse3-devel
-		;;
-	*)
-		set +x
-		echo "Installation of required packages SKIPPED, '$release' isn't supported by this script"
-		;;
-esac
+done
+echo ': ${LIZARDFS_LOOP_DISKS:="'"${loops[*]}"'"}' >> /etc/lizardfs_tests.conf
 
 set +x
 echo Machine configured successfully
